@@ -414,7 +414,7 @@ public final class CalendarUtil {
      * @param minYear      最小年份如2017
      * @param minYearMonth maxYear 最小年份月份，like : 2017-07
      * @param minYearDay   最小年份天
-     * @param week         从最小年份minYear月minYearMonth 日1 开始的第几周 week > 0
+     * @param week         从最小年份minYear月minYearMonth 日1 开始的第几周 week 大于 0
      * @param weekStart 周起始
      * @return 该星期的第一天日期
      */
@@ -515,7 +515,7 @@ public final class CalendarUtil {
      * @param maxYear      maxYear
      * @param maxYearMonth maxYearMonth
      * @param maxYearDay   maxYearDay
-     * @return <0 0 >0
+     * @return 0
      */
     public static int compareTo(int minYear, int minYearMonth, int minYearDay,
                                 int maxYear, int maxYearMonth, int maxYearDay) {
