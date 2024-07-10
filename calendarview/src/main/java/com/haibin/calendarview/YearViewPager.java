@@ -136,7 +136,7 @@ public final class YearViewPager extends ViewPager {
     final void update() {
         for (int i = 0; i < getChildCount(); i++) {
             YearRecyclerView view = (YearRecyclerView) getChildAt(i);
-            view.notifyAdapterDataSetChanged();
+            view.update();
         }
     }
 

@@ -22,6 +22,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -34,6 +35,7 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 public abstract class YearView extends View {
+    private static final String TAG = "YearView";
 
     CalendarViewDelegate mDelegate;
 
@@ -162,6 +164,9 @@ public abstract class YearView extends View {
      */
     protected int mLineCount;
 
+    protected boolean mHasData;
+    protected boolean mIsSelected;
+
     public YearView(Context context) {
         this(context, null);
     }
@@ -247,8 +252,8 @@ public abstract class YearView extends View {
         updateStyle();
     }
 
-    final void updateStyle(){
-        if(mDelegate == null){
+    final void updateStyle() {
+        if (mDelegate == null) {
             return;
         }
         this.mCurMonthTextPaint.setTextSize(mDelegate.getYearViewDayTextSize());
@@ -274,9 +279,11 @@ public abstract class YearView extends View {
      * @param year  year
      * @param month month
      */
-    final void init(int year, int month) {
+    final void init(int year, int month, boolean hasData, boolean isSelected) {
         mYear = year;
         mMonth = month;
+        mHasData = hasData;
+        mIsSelected = isSelected;
         mNextDiff = CalendarUtil.getMonthEndDiff(mYear, mMonth, mDelegate.getWeekStart());
         int preDiff = CalendarUtil.getMonthViewStartDiff(mYear, mMonth, mDelegate.getWeekStart());
 
@@ -299,13 +306,13 @@ public abstract class YearView extends View {
         Rect rect = new Rect();
         mCurMonthTextPaint.getTextBounds("1", 0, 1, rect);
         int textHeight = rect.height();
-        int mMinHeight = 12 * textHeight + getMonthViewTop();
-
-        int h = height >= mMinHeight ? height : mMinHeight;
+        int h = Math.max(height, 0);
 
         getLayoutParams().width = width;
         getLayoutParams().height = h;
         mItemHeight = (h - getMonthViewTop()) / 6;
+        mItemHeight = h;
+        Log.i(TAG, "measureSize: mItemHeight="+mItemHeight);
 
         Paint.FontMetrics metrics = mCurMonthTextPaint.getFontMetrics();
         mTextBaseLine = mItemHeight / 2 - metrics.descent + (metrics.bottom - metrics.top) / 2;
@@ -331,7 +338,7 @@ public abstract class YearView extends View {
         for (Calendar a : mItems) {
             if (mDelegate.mSchemeDatesMap.containsKey(a.toString())) {
                 Calendar d = mDelegate.mSchemeDatesMap.get(a.toString());
-                if(d == null){
+                if (d == null) {
                     continue;
                 }
                 a.setScheme(TextUtils.isEmpty(d.getScheme()) ? mDelegate.getSchemeText() : d.getScheme());
@@ -347,9 +354,10 @@ public abstract class YearView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        mItemWidth = (getWidth() -
-                mDelegate.getYearViewMonthPaddingLeft() -
-                mDelegate.getYearViewMonthPaddingRight()) / 7;
+        // mItemWidth = (getWidth() -
+        //         mDelegate.getYearViewMonthPaddingLeft() -
+        //         mDelegate.getYearViewMonthPaddingRight()) / 7;
+        this.mItemWidth = getWidth();
         onPreviewHook();
         onDrawMonth(canvas);
         onDrawWeek(canvas);
@@ -450,17 +458,18 @@ public abstract class YearView extends View {
         int x = j * mItemWidth + mDelegate.getYearViewMonthPaddingLeft();
         int y = i * mItemHeight + getMonthViewTop();
 
-        boolean isSelected = calendar.equals(mDelegate.mSelectedCalendar);
+        // boolean isSelected = calendar.equals(mDelegate.mSelectedCalendar);
+        boolean isSelected = calendar.getYear() == this.mDelegate.getSelectedMonth().getYear() && calendar.getMonth() == this.mDelegate.getSelectedMonth().getMonth();
         boolean hasScheme = calendar.hasScheme();
 
         if (hasScheme) {
-            //标记的日子
-            boolean isDrawSelected = false;//是否继续绘制选中的onDrawScheme
+            // 标记的日子
+            boolean isDrawSelected = false;// 是否继续绘制选中的onDrawScheme
             if (isSelected) {
                 isDrawSelected = onDrawSelected(canvas, calendar, x, y, true);
             }
             if (isDrawSelected || !isSelected) {
-                //将画笔设置为标记颜色
+                // 将画笔设置为标记颜色
                 mSchemePaint.setColor(calendar.getSchemeColor() != 0 ? calendar.getSchemeColor() : mDelegate.getSchemeThemeColor());
                 onDrawScheme(canvas, calendar, x, y);
             }

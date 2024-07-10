@@ -23,6 +23,8 @@ final class Month implements Serializable {
     private int count;
     private int month;
     private int year;
+    private boolean hasData;
+    private boolean selected;
 
     int getDiff() {
         return diff;
@@ -54,5 +56,21 @@ final class Month implements Serializable {
 
     void setYear(int year) {
         this.year = year;
+    }
+
+    public void setHasData(boolean hasData) {
+        this.hasData = hasData;
+    }
+
+    public boolean getHasData() {
+        return this.hasData;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean getSelected() {
+        return this.selected;
     }
 }

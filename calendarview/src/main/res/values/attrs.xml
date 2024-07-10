@@ -19,7 +19,7 @@
         <attr name="week_bar_height" format="dimension" /> <!--星期栏的高度-->
         <attr name="week_bar_view" format="string" /> <!--如果需要的话使用自定义星期栏-->
 
-        <attr name="scheme_text" format="string" />
+        <attr name="scheme_text" format="string" /><!--标记文本-->
         <attr name="day_text_size" format="dimension" />
         <attr name="lunar_text_size" format="dimension" />
         <attr name="calendar_height" format="dimension" />
@@ -45,6 +45,7 @@
         <attr name="year_view_month_text_size" format="dimension" />
         <attr name="year_view_day_text_size" format="dimension" />
         <attr name="year_view_month_text_color" format="color" />
+        <attr name="year_view_month_has_data_text_color" format="color" />
         <attr name="year_view_current_day_text_color" format="color" />
         <attr name="year_view_day_text_color" format="color" />
         <attr name="year_view_select_text_color" format="color" />
@@ -54,11 +55,21 @@
         <attr name="year_view_week_height" format="dimension" />
         <attr name="year_view_week_text_size" format="dimension" />
         <attr name="year_view_week_text_color" format="color" />
+        <!-- 月份item上下左右的边距 -->
+        <attr name="year_view_month_margin_left" format="dimension" />
+        <attr name="year_view_month_margin_top" format="dimension" />
+        <attr name="year_view_month_margin_right" format="dimension" />
+        <attr name="year_view_month_margin_bottom" format="dimension" />
+        <!-- 选中月份的背景 -->
+        <attr name="year_view_month_selected_res_id" format="dimension" />
+        <!-- 选中月份的文案颜色 -->
+        <attr name="year_view_month_selected_text_color" format="color" />
 
         <attr name="year_view_padding" format="dimension" />
         <attr name="year_view_padding_left" format="dimension" />
         <attr name="year_view_padding_right" format="dimension" />
 
+        <!-- 月份item上下左右的padding -->
         <attr name="year_view_month_padding_top" format="dimension" />
         <attr name="year_view_month_padding_left" format="dimension" />
         <attr name="year_view_month_padding_right" format="dimension" />

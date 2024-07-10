@@ -58,6 +58,8 @@ final class YearViewAdapter extends BaseRecyclerAdapter<Month> {
         }
         RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT,
                 RecyclerView.LayoutParams.MATCH_PARENT);
+        params.setMargins(mDelegate.mYearViewMonthItemMarginLeft, mDelegate.mYearViewMonthItemMarginTop,
+                mDelegate.mYearViewMonthItemMarginRight, mDelegate.mYearViewMonthItemMarginBottom);
         yearView.setLayoutParams(params);
         return new YearViewHolder(yearView, mDelegate);
     }
@@ -66,12 +68,18 @@ final class YearViewAdapter extends BaseRecyclerAdapter<Month> {
     void onBindViewHolder(RecyclerView.ViewHolder holder, Month item, int position) {
         YearViewHolder h = (YearViewHolder) holder;
         YearView view = h.mYearView;
-        view.init(item.getYear(), item.getMonth());
+        view.init(item.getYear(), item.getMonth(), item.getHasData(), item.getSelected());
         view.measureSize(mItemWidth, mItemHeight);
+        if (item.getSelected()) {
+            view.setBackgroundResource(R.drawable.shape_date_selected_bg);
+        } else {
+            view.setBackground(null);
+        }
     }
 
     private static class YearViewHolder extends RecyclerView.ViewHolder {
         YearView mYearView;
+
         YearViewHolder(View itemView, CalendarViewDelegate delegate) {
             super(itemView);
             mYearView = (YearView) itemView;

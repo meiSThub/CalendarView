@@ -417,6 +417,12 @@ final class CalendarViewDelegate {
 
     private int mMinSelectRange, mMaxSelectRange;
 
+    private final int mYearViewMonthSelectedResId;
+    int mYearViewMonthItemMarginLeft, mYearViewMonthItemMarginTop, mYearViewMonthItemMarginRight, mYearViewMonthItemMarginBottom;
+    private int mYearViewMonthSelectedTextColor;
+    private int mYearViewMonthHasDataTextColor;
+    private Calendar mSelectedDate;
+
     CalendarViewDelegate(Context context, @Nullable AttributeSet attrs) {
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.CalendarView);
 
@@ -497,7 +503,7 @@ final class CalendarViewDelegate {
                 CalendarUtil.dipToPx(context, 56));
         isFullScreenCalendar = array.getBoolean(R.styleable.CalendarView_calendar_match_parent, false);
 
-        //年视图相关
+        // 年视图相关
         mYearViewMonthTextSize = array.getDimensionPixelSize(R.styleable.CalendarView_year_view_month_text_size,
                 CalendarUtil.dipToPx(context, 18));
         mYearViewDayTextSize = array.getDimensionPixelSize(R.styleable.CalendarView_year_view_day_text_size,
@@ -537,6 +543,14 @@ final class CalendarViewDelegate {
         mYearViewMonthPaddingRight = (int) array.getDimension(R.styleable.CalendarView_year_view_month_padding_right,
                 CalendarUtil.dipToPx(context, 4));
 
+        this.mYearViewMonthSelectedTextColor = array.getColor(R.styleable.CalendarView_year_view_month_selected_text_color, -15658735);
+        this.mYearViewMonthHasDataTextColor = array.getColor(R.styleable.CalendarView_year_view_month_has_data_text_color, -15658735);
+        this.mYearViewMonthItemMarginLeft = (int) array.getDimension(R.styleable.CalendarView_year_view_month_margin_left, 0);
+        this.mYearViewMonthItemMarginTop = (int) array.getDimension(R.styleable.CalendarView_year_view_month_margin_top, 0);
+        this.mYearViewMonthItemMarginRight = (int) array.getDimension(R.styleable.CalendarView_year_view_month_margin_right, 0);
+        this.mYearViewMonthItemMarginBottom = (int) array.getDimension(R.styleable.CalendarView_year_view_month_margin_bottom, 0);
+        this.mYearViewMonthSelectedResId = array.getResourceId(R.styleable.CalendarView_year_view_month_selected_res_id, 0);
+
         if (mMinYear <= MIN_YEAR) mMinYear = MIN_YEAR;
         if (mMaxYear >= MAX_YEAR) mMaxYear = MAX_YEAR;
         array.recycle();
@@ -545,6 +559,7 @@ final class CalendarViewDelegate {
 
     private void init() {
         mCurrentDate = new Calendar();
+        mSelectedDate = new Calendar();
         Date d = new Date();
         mCurrentDate.setYear(CalendarUtil.getDate("yyyy", d));
         mCurrentDate.setMonth(CalendarUtil.getDate("MM", d));
@@ -675,7 +690,7 @@ final class CalendarViewDelegate {
         return mWeekBackground;
     }
 
-    int getYearViewBackground() {
+    public int getYearViewBackground() {
         return mYearViewBackground;
     }
 
@@ -752,8 +767,16 @@ final class CalendarViewDelegate {
         return mYearViewMonthTextColor;
     }
 
-    int getYearViewWeekTextSize() {
+    public int getYearViewWeekTextSize() {
         return mYearViewWeekTextSize;
+    }
+
+    int getYearViewMonthSelectedTextColor() {
+        return this.mYearViewMonthSelectedTextColor;
+    }
+
+    int getYearViewMonthHasDataTextColor() {
+        return this.mYearViewMonthHasDataTextColor;
     }
 
     int getYearViewWeekTextColor() {
@@ -792,6 +815,10 @@ final class CalendarViewDelegate {
 
     int getYearViewMonthPaddingTop() {
         return mYearViewMonthPaddingTop;
+    }
+
+    int getYearViewMonthSelectedResId() {
+        return this.mYearViewMonthSelectedResId;
     }
 
     int getYearViewMonthPaddingBottom() {
@@ -955,6 +982,15 @@ final class CalendarViewDelegate {
 
     Calendar getCurrentDay() {
         return mCurrentDate;
+    }
+
+    public Calendar getSelectedMonth() {
+        return this.mSelectedDate;
+    }
+
+    public void updateSelectedDay(int year, int month) {
+        this.mSelectedDate.setYear(year);
+        this.mSelectedDate.setMonth(month);
     }
 
     void updateCurrentDay() {
@@ -1161,7 +1197,7 @@ final class CalendarViewDelegate {
                 mSelectedStartRangeCalendar.getMonth() - 1,
                 mSelectedStartRangeCalendar.getDay());//
 
-        long startTimeMills = date.getTimeInMillis();//获得起始时间戳
+        long startTimeMills = date.getTimeInMillis();// 获得起始时间戳
 
 
         date.set(mSelectedEndRangeCalendar.getYear(),

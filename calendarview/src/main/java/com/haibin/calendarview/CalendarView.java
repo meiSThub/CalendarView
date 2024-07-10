@@ -227,7 +227,7 @@ public class CalendarView extends FrameLayout {
             @Override
             public void onMonthSelected(int year, int month) {
                 int position = 12 * (year - mDelegate.getMinYear()) + month - mDelegate.getMinYearMonth();
-                closeSelectLayout(position);
+                closeSelectLayout(year, month, position);
                 mDelegate.isShowYearSelectedLayout = false;
             }
         });
@@ -313,7 +313,7 @@ public class CalendarView extends FrameLayout {
         if (mParentLayout != null && mParentLayout.mContentView != null) {
             if (!mParentLayout.isExpand()) {
                 mParentLayout.expand();
-                //return;
+                // return;
             }
         }
         mWeekPager.setVisibility(GONE);
@@ -331,6 +331,7 @@ public class CalendarView extends FrameLayout {
                         super.onAnimationEnd(animation);
                         mWeekBar.setVisibility(GONE);
                         mYearViewPager.setVisibility(VISIBLE);
+                        mYearViewPager.update();
                         mYearViewPager.scrollToYear(year, false);
                         if (mParentLayout != null && mParentLayout.mContentView != null) {
                             mParentLayout.expand();
@@ -373,7 +374,7 @@ public class CalendarView extends FrameLayout {
         }
         int position = 12 * (mDelegate.mSelectedCalendar.getYear() - mDelegate.getMinYear()) +
                 mDelegate.mSelectedCalendar.getMonth() - mDelegate.getMinYearMonth();
-        closeSelectLayout(position);
+        closeSelectLayout(mDelegate.mSelectedCalendar.getYear(), mDelegate.mSelectedCalendar.getMonth(), position);
         mDelegate.isShowYearSelectedLayout = false;
     }
 
@@ -382,7 +383,7 @@ public class CalendarView extends FrameLayout {
      *
      * @param position 某一年
      */
-    private void closeSelectLayout(final int position) {
+    private void closeSelectLayout(int year, int month, final int position) {
         mYearViewPager.setVisibility(GONE);
         mWeekBar.setVisibility(VISIBLE);
         if (position == mMonthPager.getCurrentItem()) {
@@ -430,6 +431,7 @@ public class CalendarView extends FrameLayout {
                         mMonthPager.clearAnimation();
                     }
                 });
+        mDelegate.updateSelectedDay(year, month);
     }
 
     /**
@@ -1051,7 +1053,7 @@ public class CalendarView extends FrameLayout {
         }
 
 
-        //优先判断各种直接return的情况，减少代码深度
+        // 优先判断各种直接return的情况，减少代码深度
         if (mDelegate.getMinSelectRange() != -1 && mDelegate.getMinSelectRange() > minDiffer + 1) {
             if (mDelegate.mCalendarRangeSelectListener != null) {
                 mDelegate.mCalendarRangeSelectListener.onSelectOutOfRange(endCalendar, true);

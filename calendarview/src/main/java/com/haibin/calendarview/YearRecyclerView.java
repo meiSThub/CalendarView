@@ -17,27 +17,42 @@ package com.haibin.calendarview;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 年份布局选择View
  */
 public final class YearRecyclerView extends RecyclerView {
+    private static final String TAG = "YearRecyclerView";
     private CalendarViewDelegate mDelegate;
     private YearViewAdapter mAdapter;
     private OnMonthSelectedListener mListener;
+    private Map<Integer, List<Integer>> mDateMonthMap;
+    private int year;
 
     public YearRecyclerView(Context context) {
         this(context, null);
+        try {
+            Field field = Class.forName("com.mega.carlog.document.DataLoader").getField("DATE_MONTH_MAP");
+            field.setAccessible(true);
+            this.mDateMonthMap = (Map) field.get(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public YearRecyclerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mAdapter = new YearViewAdapter(context);
-        setLayoutManager(new GridLayoutManager(context, 3));
+        setLayoutManager(new GridLayoutManager(context, 4));
         setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override
@@ -77,6 +92,10 @@ public final class YearRecyclerView extends RecyclerView {
      * @param year year
      */
     final void init(int year) {
+        this.year = year;
+        Calendar selectedCalendar = this.mDelegate.getSelectedMonth();
+        int selectedYear = selectedCalendar.getYear();
+        int selectedMonth = selectedCalendar.getMonth();
         java.util.Calendar date = java.util.Calendar.getInstance();
         for (int i = 1; i <= 12; i++) {
             date.set(year, i - 1, 1);
@@ -86,8 +105,36 @@ public final class YearRecyclerView extends RecyclerView {
             month.setCount(mDaysCount);
             month.setMonth(i);
             month.setYear(year);
+            month.setHasData(hasData(year, i));
+            month.setSelected(year == selectedYear && i == selectedMonth);
             mAdapter.addItem(month);
         }
+    }
+
+    /**
+     * 更新选中的月份
+     */
+    public void update() {
+        List<Month> items = this.mAdapter.getItems();
+        Calendar selectedCalendar = this.mDelegate.getSelectedMonth();
+        int selectedYear = selectedCalendar.getYear();
+        int selectedMonth = selectedCalendar.getMonth();
+        for (int i = 0; i < items.size(); i++) {
+            Month month = items.get(i);
+            month.setSelected(month.getYear() == selectedYear && month.getMonth() == selectedMonth);
+        }
+        notifyAdapterDataSetChanged();
+    }
+
+    /**
+     * 指定月份是否有数据
+     */
+    private boolean hasData(int year, int month) {
+        List<Integer> monthList;
+        if (this.mDateMonthMap != null && this.mDateMonthMap.containsKey(Integer.valueOf(year)) && (monthList = this.mDateMonthMap.get(Integer.valueOf(year))) != null && monthList.contains(Integer.valueOf(month))) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -102,7 +149,7 @@ public final class YearRecyclerView extends RecyclerView {
     /**
      * 更新字体颜色大小
      */
-    final void updateStyle(){
+    final void updateStyle() {
         for (int i = 0; i < getChildCount(); i++) {
             YearView view = (YearView) getChildAt(i);
             view.updateStyle();
@@ -120,8 +167,8 @@ public final class YearRecyclerView extends RecyclerView {
     }
 
 
-    void notifyAdapterDataSetChanged(){
-        if(getAdapter() == null){
+    void notifyAdapterDataSetChanged() {
+        if (getAdapter() == null) {
             return;
         }
         getAdapter().notifyDataSetChanged();
@@ -132,7 +179,12 @@ public final class YearRecyclerView extends RecyclerView {
         super.onMeasure(widthSpec, heightSpec);
         int height = MeasureSpec.getSize(heightSpec);
         int width = MeasureSpec.getSize(widthSpec);
-        mAdapter.setYearViewSize(width / 3, height / 4);
+        Log.i(TAG, "onMeasure: width=" + width + ";height=" + height);
+        int itemWidth = (width - (mDelegate.getYearViewPaddingLeft() + mDelegate.getYearViewPaddingRight())) / 4
+                - (mDelegate.mYearViewMonthItemMarginLeft + mDelegate.mYearViewMonthItemMarginRight);
+        int itemHeight = height / 3 - mDelegate.mYearViewMonthItemMarginTop - mDelegate.mYearViewMonthItemMarginBottom;
+        mAdapter.setYearViewSize(itemWidth, itemHeight);
+        // mAdapter.setYearViewSize(120, 68);
     }
 
     interface OnMonthSelectedListener {

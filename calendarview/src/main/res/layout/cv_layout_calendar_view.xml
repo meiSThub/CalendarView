@@ -23,7 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginTop="41dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <View
             android:id="@+id/line"
@@ -41,5 +42,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#ffffff"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="visible" />
 </merge>
